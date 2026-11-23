@@ -1,0 +1,142 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ELVN.CO | Modern Streetwear</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; background: #fff; color: #17251d; }
+    header { background: #031308; color: white; padding: 22px 6%; display: flex; justify-content: space-between; align-items: center; }
+    .logo { font-size: 27px; font-weight: 900; letter-spacing: 3px; }
+    button { cursor: pointer; border: 0; padding: 12px 18px; font-weight: bold; }
+    .cart-btn { background: white; color: #031308; border-radius: 5px; }
+    .hero { background: #031308; color: white; padding: 75px 6%; }
+    .hero h1 { font-size: clamp(38px, 7vw, 75px); letter-spacing: 2px; }
+    .hero p { margin-top: 15px; color: #c4d2c7; }
+    .section { padding: 45px 6%; }
+    .section h2 { font-size: 28px; margin-bottom: 25px; }
+    .products { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 22px; }
+    .product { border: 1px solid #e6eae7; border-radius: 8px; overflow: hidden; }
+    .product img { width: 100%; height: 270px; object-fit: cover; background: #f2f4f2; }
+    .info { padding: 15px; }
+    .info h3 { margin-bottom: 9px; }
+    .price { font-weight: bold; color: #315d3d; margin-bottom: 12px; }
+    .add { width: 100%; background: #031308; color: white; border-radius: 4px; }
+    #cart { padding: 25px 6%; background: #f3f6f3; }
+    #cartItems { margin: 15px 0; }
+    .cart-line { padding: 9px 0; border-bottom: 1px solid #ddd; }
+    footer { background: #031308; color: white; padding: 30px 6%; text-align: center; }
+    .muted { color: #68756b; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">ELVN.CO</div>
+  <button class="cart-btn" onclick="document.getElementById('cart').scrollIntoView()">CART (<span id="count">0</span>)</button>
+</header>
+
+<section class="hero">
+  <h1>DEFINE YOUR STYLE.</h1>
+  <p>Modern Streetwear. Everyday Confidence.</p>
+</section>
+
+<section class="section">
+  <h2>NEW COLLECTION</h2>
+  <div class="products" id="products">
+    <p class="muted">Loading products...</p>
+  </div>
+</section>
+
+<section id="cart">
+  <h2>Your Shopping Cart</h2>
+  <div id="cartItems">Your cart is empty.</div>
+  <h3>Total: ৳<span id="total">0</span></h3>
+</section>
+
+<footer>
+  <h2>ELVN.CO</h2>
+  <p style="margin-top:10px">Modern Fashion • Modern Lifestyle</p>
+</footer>
+
+<script>
+  // নিজের Supabase Project URL ও Publishable Key বসাবে
+  const SUPABASE_URL = "https://abfoiyioilostkjncqbp.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_AAFZtO78grOiGWivhQPewA_dMp7iWdq";
+
+  const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  let cart = [];
+
+  async function loadProducts() {
+    const container = document.getElementById("products");
+
+    const { data, error } = await db
+      .from("products")
+      .select("*")
+      .eq("is_active", true)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      container.innerHTML = "<p>Products load হয়নি। Supabase settings চেক করতে হবে।</p>";
+      return;
+    }
+
+    if (!data || data.length === 0) {
+      container.innerHTML = "<p class='muted'>New collection coming soon.</p>";
+      return;
+    }
+
+    container.innerHTML = data.map(p => `
+      <div class="product">
+        <img src="${p.image_url || ''}" alt="${p.name}" onerror="this.style.display='none'">
+        <div class="info">
+          <h3>${escapeHTML(p.name)}</h3>
+          <p class="price">৳${p.price}</p>
+          <button class="add" onclick="addToCart('${p.id}')">ADD TO CART</button>
+        </div>
+      </div>
+    `).join("");
+
+    window.productsData = data;
+  }
+
+  function escapeHTML(value) {
+    return String(value ?? "").replace(/[&<>"']/g, c => ({
+      "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
+    })[c]);
+  }
+
+  function addToCart(id) {
+    const product = window.productsData.find(p => p.id === id);
+    if (!product) return;
+    cart.push(product);
+    renderCart();
+  }
+
+  function renderCart() {
+    document.getElementById("count").textContent = cart.length;
+    document.getElementById("total").textContent =
+      cart.reduce((sum, p) => sum + Number(p.price), 0);
+
+    document.getElementById("cartItems").innerHTML = cart.length
+      ? cart.map((p, i) => `
+          <div class="cart-line">
+            ${escapeHTML(p.name)} — ৳${p.price}
+            <button onclick="removeItem(${i})">Remove</button>
+          </div>
+        `).join("")
+      : "Your cart is empty.";
+  }
+
+  function removeItem(index) {
+    cart.splice(index, 1);
+    renderCart();
+  }
+
+  loadProducts();
+</script>
+</body>
+</html>
