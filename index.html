@@ -79,10 +79,10 @@
       .eq("is_active", true)
       .order("created_at", { ascending: false });
 
-    if (error) {
-      container.innerHTML = "<p>Products load হয়নি। Supabase settings চেক করতে হবে।</p>";
-      return;
-    }
+   if (error) {
+  container.innerHTML = "<p>ERROR: " + escapeHTML(error.message) + "</p>";
+  return;
+}
 
     if (!data || data.length === 0) {
       container.innerHTML = "<p class='muted'>New collection coming soon.</p>";
