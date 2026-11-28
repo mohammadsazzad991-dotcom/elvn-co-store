@@ -511,6 +511,7 @@ document.addEventListener("touchend", function(e) {
   }
 
  
+
 function addToCart(id, button) {
   const product = window.productsData.find(p => p.id === id);
   if (!product) return;
@@ -523,6 +524,51 @@ function addToCart(id, button) {
     parseInt(productBox.querySelector(".product-quantity").value) || 1
   );
 
+  // Find product image and cart button
+  const image = productBox.querySelector("img.product-main-image");
+  const cartButton = document.querySelector(".cart-btn");
+
+  // Fly image animation
+  if (image && cartButton) {
+    const start = image.getBoundingClientRect();
+    const end = cartButton.getBoundingClientRect();
+
+    const flyingImage = document.createElement("img");
+    flyingImage.src = image.src;
+    flyingImage.className = "fly-to-cart";
+
+    Object.assign(flyingImage.style, {
+      position: "fixed",
+      left: start.left + "px",
+      top: start.top + "px",
+      width: start.width + "px",
+      height: start.height + "px",
+      zIndex: "999999",
+      pointerEvents: "none",
+      objectFit: "contain",
+      transition: "all 0.8s cubic-bezier(0.22, 1, 0.36, 1)"
+    });
+
+    document.body.appendChild(flyingImage);
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        flyingImage.style.left = (end.left + end.width / 2) + "px";
+        flyingImage.style.top = (end.top + end.height / 2) + "px";
+        flyingImage.style.width = "20px";
+        flyingImage.style.height = "20px";
+        flyingImage.style.opacity = "0";
+      });
+    });
+
+    setTimeout(() => flyingImage.remove(), 900);
+
+    cartButton.classList.remove("cart-bounce");
+    void cartButton.offsetWidth;
+    cartButton.classList.add("cart-bounce");
+  }
+
+  // Add product to cart
   cart.push({
     ...product,
     selectedSize,
@@ -531,6 +577,7 @@ function addToCart(id, button) {
 
   renderCart();
 }
+
 
 
 
