@@ -335,11 +335,27 @@ body.cart-open::before {
 
 
 
+
 function openCart() {
-  document.getElementById("cart").classList.add("cart-open");
+  const cartElement = document.getElementById("cart");
+
+  cartElement.classList.add("cart-open");
   document.body.classList.add("cart-open");
   document.body.style.overflow = "hidden";
+
+  // Animate newly added cart items
+  requestAnimationFrame(() => {
+    document.querySelectorAll("#cart .cart-line.new-cart-item")
+      .forEach(item => {
+        item.classList.remove("new-cart-item");
+
+        void item.offsetWidth;
+
+        item.classList.add("new-cart-item");
+      });
+  });
 }
+
 
 function closeCart() {
   document.getElementById("cart").classList.remove("cart-open");
