@@ -735,8 +735,23 @@ function removeItem(index, button) {
   if (!item) return;
 
   button.disabled = true;
-item.classList.add("removing");
-  setTimeout(() => {
+
+  const animation = item.animate([
+    {
+      opacity: 1,
+      transform: "translateX(0) scale(1)"
+    },
+    {
+      opacity: 0,
+      transform: "translateX(45px) scale(0.96)"
+    }
+  ], {
+    duration: 350,
+    easing: "cubic-bezier(0.22, 1, 0.36, 1)",
+    fill: "forwards"
+  });
+
+  animation.onfinish = () => {
     const currentIndex = cart.indexOf(product);
 
     if (currentIndex !== -1) {
@@ -756,7 +771,7 @@ item.classList.add("removing");
       document.getElementById("cartItems").textContent =
         "Your cart is empty.";
     }
-  }, 300);
+  };
 }
   loadProducts();
 </script>
