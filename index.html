@@ -349,9 +349,95 @@ body.cart-open::before {
   let cart = [];
 
 function openCheckout() {
-  alert("Checkout form will open here!");
+  if (!cart.length) {
+    alert("Your cart is empty!");
+    return;
+  }
+
+  const oldModal = document.getElementById("checkoutModal");
+  if (oldModal) oldModal.remove();
+
+  const modal = document.createElement("div");
+  modal.id = "checkoutModal";
+  modal.style.cssText = `
+    position:fixed;inset:0;background:rgba(0,0,0,.7);
+    z-index:99999;display:flex;align-items:center;
+    justify-content:center;padding:15px;overflow:auto;
+  `;
+
+  modal.innerHTML = `
+    <div style="background:white;color:#111;width:100%;max-width:480px;
+      padding:22px;border-radius:10px;max-height:90vh;overflow:auto;">
+      <h2 style="margin-bottom:18px;">CHECKOUT</h2>
+
+      <label>Full Name</label>
+      <input id="coName" type="text" placeholder="Your name"
+        style="width:100%;padding:12px;margin:7px 0 14px;">
+
+      <label>Phone Number</label>
+      <input id="coPhone" type="tel" placeholder="01XXXXXXXXX"
+        style="width:100%;padding:12px;margin:7px 0 14px;">
+
+      <label>Full Address</label>
+      <textarea id="coAddress" placeholder="House, road, area..."
+        style="width:100%;padding:12px;margin:7px 0 14px;"></textarea>
+
+      <label>Delivery Area</label>
+      <select id="coArea" onchange="updateDeliveryCharge()"
+        style="width:100%;padding:12px;margin:7px 0 14px;">
+        <option value="Inside Chattogram">Inside Chattogram - ৳80</option>
+        <option value="Outside Chattogram">Outside Chattogram - ৳130</option>
+      </select>
+
+      <div style="background:#f3f3f3;padding:14px;margin:10px 0;">
+        <p>Product Total: ৳<span id="coProductTotal">0</span></p>
+        <p>Delivery Charge: ৳<span id="coDelivery">80</span></p>
+        <p style="font-weight:bold;margin-top:8px;">
+          Pay Now (Delivery Only): ৳<span id="coPayNow">80</span>
+        </p>
+        <p>Remaining COD: ৳<span id="coCOD">0</span></p>
+      </div>
+
+      <p style="margin:12px 0;">
+        bKash Personal Send Money: <b>01645941660</b><br>
+        শুধু Delivery Charge পাঠাবে। বাকি টাকা Cash on Delivery।
+      </p>
+
+      <label>bKash Transaction ID (TrxID)</label>
+      <input id="coTrx" type="text" placeholder="Enter TrxID"
+        style="width:100%;padding:12px;margin:7px 0 14px;">
+
+      <button id="coSubmit" onclick="submitOrder()"
+        style="width:100%;padding:14px;background:#031308;color:white;border:0;border-radius:5px;font-weight:bold;">
+        CONFIRM ORDER
+      </button>
+
+      <button onclick="document.getElementById('checkoutModal').remove()"
+        style="width:100%;padding:12px;margin-top:8px;background:#eee;border:0;">
+        CLOSE
+      </button>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  const productTotal = cart.reduce(
+    (sum, p) => sum + Number(p.price) * Number(p.quantity || 1), 0
+  );
+
+  document.getElementById("coProductTotal").textContent = productTotal;
+  document.getElementById("coCOD").textContent = productTotal;
+  updateDeliveryCharge();
 }
 
+function updateDeliveryCharge() {
+  const area = document.getElementById("coArea");
+  if (!area) return;
+
+  const fee = area.value === "Inside Chattogram" ? 80 : 130;
+  document.getElementById("coDelivery").textContent = fee;
+  document.getElementById("coPayNow").textContent = fee;
+}
 function openCart() {
   const cartElement = document.getElementById("cart");
 
@@ -562,62 +648,7 @@ document.addEventListener("touchend", function(e) {
   }
 }, { passive: true });
 
-  function escapeHTML(value) {
-    return String(value ?? "").replace(/[&<>"']/g, c => ({
-      "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
-    })[c]);
-  }
-
- 
-
-function addToCart(id, button) {
-  const product = window.productsData.find(p => p.id === id);
-  if (!product) return;
-
-  const productBox = button.closest(".product");
-
-  const selectedSize = productBox.querySelector(".product-size").value;
-  const quantity = Math.max(
-    1,
-    parseInt(productBox.querySelector(".product-quantity").value) || 1
-  );
-
-  // Find product image and cart button
-  const image = productBox.querySelector("img.product-main-image");
-  const cartButton = document.querySelector(".cart-btn");
-
-  // Fly image animation
- 
-if (image && cartButton) {
-  const start = image.getBoundingClientRect();
-  const end = cartButton.getBoundingClientRect();
-
-  const flyingImage = document.createElement("img");
-  flyingImage.src = image.src;
-
-  Object.assign(flyingImage.style, {
-    position: "fixed",
-    left: start.left + "px",
-    top: start.top + "px",
-    width: start.width + "px",
-    height: start.height + "px",
-    zIndex: "999999",
-    pointerEvents: "none",
-    objectFit: "contain",
-    transformOrigin: "center center"
-  });
-
-  document.body.appendChild(flyingImage);
-
-  const dx = end.left + end.width / 2 -
-    (start.left + start.width / 2);
-
-  const dy = end.top + end.height / 2 -
-    (start.top + start.height / 2);
-
-  const curve = Math.min(150, Math.max(70, Math.abs(dx) * 0.18));
-
-  flyingImage.animate([
+  function addToCart
     {
       transform: "translate(0, 0) scale(1)",
       opacity: 1
