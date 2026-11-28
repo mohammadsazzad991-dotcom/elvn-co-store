@@ -328,9 +328,10 @@ body.cart-open::before {
     <h3 style="text-align:right;color:#031308;">
       Subtotal: ৳<span id="total">0</span>
     </h3>
-    <button style="width:100%;padding:15px;background:#031308;color:white;border:0;border-radius:6px;font-weight:bold;margin-top:15px;cursor:pointer;">
-      PROCEED TO CHECKOUT
-    </button>
+   <button onclick="openCheckout()"
+  style="width:100%;padding:15px;background:#031308;color:white;border:0;border-radius:6px;font-weight:bold;margin-top:15px;cursor:pointer;">
+  PROCEED TO CHECKOUT
+</button>
   </div>
 </section>
 
@@ -347,7 +348,9 @@ body.cart-open::before {
   const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
   let cart = [];
 
-
+function openCheckout() {
+  alert("Checkout is being prepared!");
+}
 
 
 function openCart() {
