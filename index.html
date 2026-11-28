@@ -651,10 +651,7 @@ function renderCart() {
       `).join("")
     : "Your cart is empty.";
 
-  // Remove animation flag after rendering
-  cart.forEach(p => {
-    delete p._justAdded;
-  });
+ 
 }
 
 function changeCartQuantity(index, change) {
