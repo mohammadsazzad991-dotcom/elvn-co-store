@@ -720,9 +720,6 @@ function removeItem(index, button) {
   const item = button.closest(".cart-line");
   if (!item) return;
 
-  const productId = product.id;
-  const selectedSize = product.selectedSize;
-
   button.disabled = true;
 
   item.style.transition =
@@ -732,10 +729,7 @@ function removeItem(index, button) {
   item.style.transform = "translateX(35px) scale(0.97)";
 
   setTimeout(() => {
-    const currentIndex = cart.findIndex(p =>
-      p.id === productId &&
-      p.selectedSize === selectedSize
-    );
+    const currentIndex = cart.indexOf(product);
 
     if (currentIndex !== -1) {
       cart.splice(currentIndex, 1);
