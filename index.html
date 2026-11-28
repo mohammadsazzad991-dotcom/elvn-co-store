@@ -242,6 +242,32 @@ body.cart-open::before {
   65% { transform: scale(0.92); }
   100% { transform: scale(1); }
 }
+
+/* ELVN.CO CART ITEM ANIMATION */
+
+@keyframes cartItemEnter {
+  0% {
+    opacity: 0;
+    transform: translateX(45px) scale(0.96);
+    box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+  }
+
+  60% {
+    opacity: 1;
+    transform: translateX(-5px) scale(1.01);
+    box-shadow: 0 0 22px rgba(3, 19, 8, 0.16);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+    box-shadow: 0 3px 12px rgba(0,0,0,0.035);
+  }
+}
+
+.cart-line.new-cart-item {
+  animation: cartItemEnter 0.65s ease forwards;
+}
   
  </style>
 </head>
@@ -570,10 +596,11 @@ function addToCart(id, button) {
 
   // Add product to cart
   cart.push({
-    ...product,
-    selectedSize,
-    quantity
-  });
+  ...product,
+  selectedSize,
+  quantity,
+  _justAdded: true
+});
 
   renderCart();
 }
@@ -591,7 +618,7 @@ function renderCart() {
 
   document.getElementById("cartItems").innerHTML = cart.length
     ? cart.map((p, i) => `
-        <div class="cart-line">
+        <div class="cart-line ${p._justAdded ? 'new-cart-item' : ''}">
 
           <img
             src="${escapeHTML((Array.isArray(p.images) && p.images.length ? p.images[0] : p.image_url) || '')}"
@@ -623,6 +650,11 @@ function renderCart() {
         </div>
       `).join("")
     : "Your cart is empty.";
+
+  // Remove animation flag after rendering
+  cart.forEach(p => {
+    delete p._justAdded;
+  });
 }
 
 function changeCartQuantity(index, change) {
