@@ -59,7 +59,21 @@
   border-radius: 10px;
   box-shadow: 0 3px 12px rgba(0,0,0,0.035);
 }
+@keyframes removeCartItem {
+  from {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(45px) scale(0.96);
+  }
+}
 
+.cart-line.removing {
+  animation: removeCartItem 0.35s ease forwards;
+  pointer-events: none;
+}
 .cart-line img {
   width: 125px !important;
   height: 145px !important;
@@ -721,13 +735,7 @@ function removeItem(index, button) {
   if (!item) return;
 
   button.disabled = true;
-
-  item.style.transition =
-    "opacity 0.3s ease, transform 0.3s ease";
-
-  item.style.opacity = "0";
-  item.style.transform = "translateX(35px) scale(0.97)";
-
+item.classList.add("removing");
   setTimeout(() => {
     const currentIndex = cart.indexOf(product);
 
