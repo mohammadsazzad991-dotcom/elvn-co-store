@@ -162,7 +162,26 @@ container.innerHTML = data.map(p => {
       <div class="info">
         <h3>${escapeHTML(p.name)}</h3>
         <p class="price">৳${p.price}</p>
-        <button class="add" onclick="addToCart('${p.id}')">ADD TO CART</button>
+        
+<div style="margin:12px 0;">
+  <label>SELECT SIZE</label>
+  <select class="product-size" style="width:100%;padding:10px;margin-top:5px;">
+    ${(Array.isArray(p.sizes) && p.sizes.length ? p.sizes : ["One Size"]).map(size => `
+      <option value="${escapeHTML(size)}">${escapeHTML(size)}</option>
+    `).join("")}
+  </select>
+
+  <label style="display:block;margin-top:12px;">QUANTITY</label>
+  <input
+    class="product-quantity"
+    type="number"
+    min="1"
+    value="1"
+    style="width:100%;padding:10px;margin-top:5px;"
+  >
+</div>
+
+       <button class="add" onclick="addToCart('${p.id}', this)">ADD TO CART</button>
       </div>
     </div>
   `;
@@ -269,27 +288,50 @@ document.addEventListener("touchend", function(e) {
     })[c]);
   }
 
-  function addToCart(id) {
-    const product = window.productsData.find(p => p.id === id);
-    if (!product) return;
-    cart.push(product);
-    renderCart();
-  }
+ 
+function addToCart(id, button) {
+  const product = window.productsData.find(p => p.id === id);
+  if (!product) return;
 
-  function renderCart() {
-    document.getElementById("count").textContent = cart.length;
-    document.getElementById("total").textContent =
-      cart.reduce((sum, p) => sum + Number(p.price), 0);
+  const productBox = button.closest(".product");
 
-    document.getElementById("cartItems").innerHTML = cart.length
-      ? cart.map((p, i) => `
-          <div class="cart-line">
-            ${escapeHTML(p.name)} — ৳${p.price}
-            <button onclick="removeItem(${i})">Remove</button>
-          </div>
-        `).join("")
-      : "Your cart is empty.";
-  }
+  const selectedSize = productBox.querySelector(".product-size").value;
+  const quantity = Math.max(
+    1,
+    parseInt(productBox.querySelector(".product-quantity").value) || 1
+  );
+
+  cart.push({
+    ...product,
+    selectedSize,
+    quantity
+  });
+
+  renderCart();
+}
+
+
+
+function renderCart() {
+  document.getElementById("count").textContent =
+    cart.reduce((sum, p) => sum + Number(p.quantity || 1), 0);
+
+  document.getElementById("total").textContent =
+    cart.reduce((sum, p) => sum + Number(p.price) * Number(p.quantity || 1), 0);
+
+  document.getElementById("cartItems").innerHTML = cart.length
+    ? cart.map((p, i) => `
+        <div class="cart-line">
+          ${escapeHTML(p.name)}
+          — Size: ${escapeHTML(p.selectedSize || "One Size")}
+          — Qty: ${p.quantity || 1}
+          — ৳${Number(p.price) * Number(p.quantity || 1)}
+          <button onclick="removeItem(${i})">Remove</button>
+        </div>
+      `).join("")
+    : "Your cart is empty.";
+}
+
 
   function removeItem(index) {
     cart.splice(index, 1);
