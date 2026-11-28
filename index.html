@@ -172,7 +172,53 @@
 
 .lightbox-next {
   right: 10px;
-} </style>
+}
+
+/* ELVN.CO SMOOTH SLIDE CART */
+
+#cart {
+  position: fixed !important;
+  top: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: min(480px, 92vw) !important;
+  height: 100vh !important;
+  max-width: none !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+  z-index: 10001 !important;
+  overflow-y: auto;
+  box-sizing: border-box;
+  background: #ffffff !important;
+
+  transform: translateX(100%);
+  visibility: hidden;
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+              visibility 0.4s;
+  display: block !important;
+}
+
+#cart.cart-open {
+  transform: translateX(0);
+  visibility: visible;
+}
+
+body.cart-open::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.48);
+  backdrop-filter: blur(3px);
+  z-index: 10000;
+  animation: cartFade 0.3s ease;
+}
+
+@keyframes cartFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+  
+ </style>
 </head>
 <body>
 
@@ -230,19 +276,19 @@
   let cart = [];
 
 
+
 function openCart() {
-  document.getElementById("products").parentElement.style.display = "none";
-  document.querySelector(".hero").style.display = "none";
-  document.getElementById("cart").style.display = "block";
-  window.scrollTo(0, 0);
+  document.getElementById("cart").classList.add("cart-open");
+  document.body.classList.add("cart-open");
+  document.body.style.overflow = "hidden";
 }
 
 function closeCart() {
-  document.getElementById("cart").style.display = "none";
-  document.getElementById("products").parentElement.style.display = "block";
-  document.querySelector(".hero").style.display = "block";
-  window.scrollTo(0, 0);
+  document.getElementById("cart").classList.remove("cart-open");
+  document.body.classList.remove("cart-open");
+  document.body.style.overflow = "";
 }
+
 
   async function loadProducts() {
     const container = document.getElementById("products");
