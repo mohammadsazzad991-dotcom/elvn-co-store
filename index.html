@@ -217,6 +217,31 @@ body.cart-open::before {
   from { opacity: 0; }
   to { opacity: 1; }
 }
+
+/* ELVN.CO ADD TO CART FLY ANIMATION */
+
+.fly-to-cart {
+  position: fixed;
+  z-index: 99999;
+  pointer-events: none;
+  object-fit: contain;
+  background: white;
+  border-radius: 8px;
+  transition:
+    transform 0.75s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.75s ease;
+}
+
+.cart-btn.cart-bounce {
+  animation: cartBounce 0.55s ease;
+}
+
+@keyframes cartBounce {
+  0% { transform: scale(1); }
+  35% { transform: scale(1.25); }
+  65% { transform: scale(0.92); }
+  100% { transform: scale(1); }
+}
   
  </style>
 </head>
@@ -248,7 +273,14 @@ body.cart-open::before {
     ← CONTINUE SHOPPING
   </button>
 
-  <h2 style="color:#031308;margin-bottom:20px;">Your Shopping Cart</h2>
+
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:25px;">
+  <h2 style="color:#031308;margin:0;">YOUR CART</h2>
+  <button onclick="closeCart()" style="background:#f0f4f0;color:#031308;font-size:25px;padding:5px 13px;border-radius:50%;">
+    ×
+  </button>
+</div>
+
 
   <div id="cartItems">Your cart is empty.</div>
 
@@ -289,6 +321,18 @@ function closeCart() {
   document.body.style.overflow = "";
 }
 
+
+document.addEventListener("click", function(event) {
+  const cart = document.getElementById("cart");
+
+  if (
+    document.body.classList.contains("cart-open") &&
+    !cart.contains(event.target) &&
+    !event.target.closest(".cart-btn")
+  ) {
+    closeCart();
+  }
+});
 
   async function loadProducts() {
     const container = document.getElementById("products");
@@ -490,6 +534,7 @@ function addToCart(id, button) {
 
 
 
+
 function renderCart() {
   document.getElementById("count").textContent =
     cart.reduce((sum, p) => sum + Number(p.quantity || 1), 0);
@@ -499,28 +544,50 @@ function renderCart() {
 
   document.getElementById("cartItems").innerHTML = cart.length
     ? cart.map((p, i) => `
-        <div class="cart-line" style="display:flex;gap:15px;align-items:center;padding:15px 0;border-bottom:1px solid #ddd;flex-wrap:wrap;">
+        <div class="cart-line">
 
           <img
             src="${escapeHTML((Array.isArray(p.images) && p.images.length ? p.images[0] : p.image_url) || '')}"
             alt="${escapeHTML(p.name)}"
-            style="width:100px;height:110px;object-fit:contain;background:white;border-radius:6px;"
           >
 
           <div style="flex:1;min-width:150px;">
             <h3>${escapeHTML(p.name)}</h3>
             <p>Size: ${escapeHTML(p.selectedSize || "One Size")}</p>
-            <p>Quantity: ${p.quantity || 1}</p>
             <p>Price: ৳${p.price}</p>
+
+            <div style="display:flex;align-items:center;gap:12px;margin:12px 0;">
+              <button onclick="changeCartQuantity(${i}, -1)"
+                style="background:#e9eee9;padding:7px 13px;border-radius:4px;">−</button>
+
+              <strong>${p.quantity || 1}</strong>
+
+              <button onclick="changeCartQuantity(${i}, 1)"
+                style="background:#031308;color:white;padding:7px 13px;border-radius:4px;">+</button>
+            </div>
+
             <p><strong>Total: ৳${Number(p.price) * Number(p.quantity || 1)}</strong></p>
-            <button onclick="removeItem(${i})" style="padding:7px 12px;background:#031308;color:white;border:0;border-radius:4px;cursor:pointer;">
+
+            <button onclick="removeItem(${i})"
+              style="background:transparent;color:#8b2929;border:1px solid #8b2929;padding:8px 14px;border-radius:5px;">
               REMOVE
             </button>
           </div>
-
         </div>
       `).join("")
     : "Your cart is empty.";
+}
+
+function changeCartQuantity(index, change) {
+  if (!cart[index]) return;
+
+  cart[index].quantity = Number(cart[index].quantity || 1) + change;
+
+  if (cart[index].quantity <= 0) {
+    cart.splice(index, 1);
+  }
+
+  renderCart();
 }
 
 
