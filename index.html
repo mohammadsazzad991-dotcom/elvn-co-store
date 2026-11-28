@@ -1108,7 +1108,7 @@ async function submitOrder() {
     payment_trxid: trxid,
     status: "pending",
     items: items
-  }]).select();
+ }]);
 
   if (error) {
     alert("Order Error: " + error.message);
