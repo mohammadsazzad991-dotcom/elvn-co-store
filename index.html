@@ -676,7 +676,7 @@ function renderCart() {
 
             <p><strong>Total: ৳${Number(p.price) * Number(p.quantity || 1)}</strong></p>
 
-            <button onclick="removeItem(${i})"
+           <button onclick="removeItem(${i}, this)"
               style="background:transparent;color:#8b2929;border:1px solid #8b2929;padding:8px 14px;border-radius:5px;">
               REMOVE
             </button>
@@ -713,21 +713,48 @@ function changeCartQuantity(index, change) {
 
 
   
-function removeItem(index) {
+function removeItem(index, button) {
   if (!cart[index]) return;
 
-  const item = document.querySelectorAll("#cart .cart-line")[index];
-
+  const item = button.closest(".cart-line");
   if (!item) return;
 
-  item.style.transition = "opacity 0.4s ease, transform 0.4s ease";
+  // Stop old animations on other products
+  document.querySelectorAll("#cart .cart-line").forEach(row => {
+    row.classList.remove("new-cart-item");
+  });
+
+  cart.forEach(p => {
+    p._justAdded = false;
+  });
+
+  // Button click animation
+  button.style.transition = "transform 0.15s ease";
+  button.style.transform = "scale(0.90)";
+
+  // Only selected product animation
+  item.style.transition =
+    "opacity 0.3s ease, transform 0.3s ease";
+
   item.style.opacity = "0";
-  item.style.transform = "translateX(60px) scale(0.95)";
+  item.style.transform = "translateX(35px) scale(0.97)";
 
   setTimeout(() => {
     cart.splice(index, 1);
-    renderCart();
-  }, 400);
+    item.remove();
+
+    document.getElementById("count").textContent =
+      cart.reduce((sum, p) => sum + Number(p.quantity || 1), 0);
+
+    document.getElementById("total").textContent =
+      cart.reduce((sum, p) =>
+        sum + Number(p.price) * Number(p.quantity || 1), 0);
+
+    if (cart.length === 0) {
+      document.getElementById("cartItems").textContent =
+        "Your cart is empty.";
+    }
+  }, 300);
 }
 
   loadProducts();
