@@ -714,25 +714,17 @@ function changeCartQuantity(index, change) {
 
   
 function removeItem(index, button) {
-  if (!cart[index]) return;
+  const product = cart[index];
+  if (!product) return;
 
   const item = button.closest(".cart-line");
   if (!item) return;
 
-  // Stop old animations on other products
-  document.querySelectorAll("#cart .cart-line").forEach(row => {
-    row.classList.remove("new-cart-item");
-  });
+  const productId = product.id;
+  const selectedSize = product.selectedSize;
 
-  cart.forEach(p => {
-    p._justAdded = false;
-  });
+  button.disabled = true;
 
-  // Button click animation
-  button.style.transition = "transform 0.15s ease";
-  button.style.transform = "scale(0.90)";
-
-  // Only selected product animation
   item.style.transition =
     "opacity 0.3s ease, transform 0.3s ease";
 
@@ -740,7 +732,15 @@ function removeItem(index, button) {
   item.style.transform = "translateX(35px) scale(0.97)";
 
   setTimeout(() => {
-    cart.splice(index, 1);
+    const currentIndex = cart.findIndex(p =>
+      p.id === productId &&
+      p.selectedSize === selectedSize
+    );
+
+    if (currentIndex !== -1) {
+      cart.splice(currentIndex, 1);
+    }
+
     item.remove();
 
     document.getElementById("count").textContent =
@@ -756,7 +756,6 @@ function removeItem(index, button) {
     }
   }, 300);
 }
-
   loadProducts();
 </script>
 </body>
