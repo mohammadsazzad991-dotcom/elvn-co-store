@@ -718,22 +718,17 @@ function removeItem(index) {
 
   const item = document.querySelectorAll("#cart .cart-line")[index];
 
-  if (!item) {
-    cart.splice(index, 1);
-    renderCart();
-    return;
-  }
+  if (!item) return;
 
-  item.style.transition = "opacity 0.35s ease, transform 0.35s ease";
+  item.style.transition = "opacity 0.4s ease, transform 0.4s ease";
   item.style.opacity = "0";
-  item.style.transform = "translateX(50px)";
+  item.style.transform = "translateX(60px) scale(0.95)";
 
   setTimeout(() => {
     cart.splice(index, 1);
     renderCart();
-  }, 350);
+  }, 400);
 }
-
 
   loadProducts();
 </script>
