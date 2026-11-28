@@ -30,7 +30,49 @@
     .cart-line { padding: 9px 0; border-bottom: 1px solid #ddd; }
     footer { background: #031308; color: white; padding: 30px 6%; text-align: center; }
     .muted { color: #68756b; }
-  </style>
+ .product-main-image {
+  cursor: zoom-in;
+}
+
+.image-lightbox {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.95);
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.image-lightbox img {
+  max-width: 90%;
+  max-height: 85vh;
+  object-fit: contain;
+  cursor: zoom-in;
+}
+
+.lightbox-btn {
+  position: absolute;
+  color: white;
+  background: transparent;
+  border: none;
+  font-size: 40px;
+  cursor: pointer;
+  padding: 15px;
+}
+
+.lightbox-close {
+  top: 15px;
+  right: 20px;
+}
+
+.lightbox-prev {
+  left: 10px;
+}
+
+.lightbox-next {
+  right: 10px;
+} </style>
 </head>
 <body>
 
