@@ -346,8 +346,7 @@ body.cart-open::before {
   const SUPABASE_KEY = "sb_publishable_AAFZtO78grOiGWivhQPewA_dMp7iWdq";
 
   const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-  let cart = [];
-
+ let cart = [];
 function openCheckout() {
   if (!cart.length) {
     alert("Your cart is empty!");
@@ -492,8 +491,8 @@ function escapeHTML(value) {
     const { data, error } = await db
       .from("products")
       .select("*")
-      .eq("is_active", true)
-      .order("created_at", { ascending: false });
+     
+    
 
    if (error) {
   container.innerHTML = "<p>ERROR: " + escapeHTML(error.message) + "</p>";
@@ -933,69 +932,108 @@ if (new URLSearchParams(window.location.search).has("admin")) {
   `;
 }
 // ELVN.CO ADMIN DASHBOARD
+
 function showAdminDashboard() {
   document.body.innerHTML = `
-    <div style="
-      min-height:100vh;
-      background:#f5f7f5;
-      font-family:Arial,sans-serif;
-      padding:25px;
-    ">
-      <header style="
-        background:#031308;
-        color:white;
-        padding:22px;
-        border-radius:10px;
-        display:flex;
-        justify-content:space-between;
-        align-items:center;
-      ">
+    <div style="min-height:100vh;background:#f5f7f5;font-family:Arial;padding:25px;">
+      <header style="background:#031308;color:white;padding:22px;border-radius:10px;display:flex;justify-content:space-between;align-items:center;">
         <h2>ELVN.CO ADMIN</h2>
-        <button onclick="adminLogout()"
-          style="padding:10px 18px;background:white;color:#031308;border:0;border-radius:5px;">
-          LOGOUT
-        </button>
+        <button onclick="adminLogout()" style="padding:10px 18px;">LOGOUT</button>
       </header>
 
-      <h2 style="margin:30px 0 20px;">Dashboard</h2>
+      <h2 style="margin:30px 0 20px;">Manage Products</h2>
 
-      <div style="
-        display:grid;
-        grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-        gap:18px;
-      ">
-        <div style="background:white;padding:25px;border-radius:10px;">
-          <h3>Manage Products</h3>
-          <p style="margin-top:10px;color:#777;">Add, edit and delete products</p>
-        </div>
+      <div style="background:white;padding:22px;border-radius:10px;max-width:650px;">
+        <h3>Add New Product</h3>
 
-        <div style="background:white;padding:25px;border-radius:10px;">
-          <h3>Manage Orders</h3>
-          <p style="margin-top:10px;color:#777;">View and manage customer orders</p>
-        </div>
+        <input id="pName" placeholder="Product Name" style="width:100%;padding:12px;margin-top:12px;">
+        <textarea id="pDescription" placeholder="Description" style="width:100%;padding:12px;margin-top:12px;"></textarea>
+        <input id="pPrice" type="number" placeholder="Price (৳)" style="width:100%;padding:12px;margin-top:12px;">
+        <input id="pCategory" placeholder="Category" style="width:100%;padding:12px;margin-top:12px;">
+        <input id="pImage" placeholder="Image URL" style="width:100%;padding:12px;margin-top:12px;">
+        <input id="pSizes" placeholder="Sizes (S,M,L,XL)" style="width:100%;padding:12px;margin-top:12px;">
+        <input id="pStock" type="number" placeholder="Stock" style="width:100%;padding:12px;margin-top:12px;">
 
-        <div style="background:white;padding:25px;border-radius:10px;">
-          <h3>Sales Overview</h3>
-          <p style="margin-top:10px;color:#777;">View sales information</p>
-        </div>
-
-        <div style="background:white;padding:25px;border-radius:10px;">
-          <h3>Customers</h3>
-          <p style="margin-top:10px;color:#777;">View customer information</p>
-        </div>
-
-        <div style="background:white;padding:25px;border-radius:10px;">
-          <h3>Store Appearance</h3>
-          <p style="margin-top:10px;color:#777;">Manage store design</p>
-        </div>
-
-        <div style="background:white;padding:25px;border-radius:10px;">
-          <h3>Store Settings</h3>
-          <p style="margin-top:10px;color:#777;">Manage store settings</p>
-        </div>
+        <button onclick="addProduct()" style="margin-top:15px;padding:13px 22px;background:#031308;color:white;border:0;border-radius:5px;">
+          ADD PRODUCT
+        </button>
       </div>
+
+      <h2 style="margin:30px 0 15px;">All Products</h2>
+      <div id="adminProductList">Loading products...</div>
     </div>
   `;
+
+  loadAdminProducts();
+}
+
+async function addProduct() {
+  const product = {
+    name: document.getElementById("pName").value.trim(),
+    description: document.getElementById("pDescription").value.trim(),
+    price: Number(document.getElementById("pPrice").value),
+    category: document.getElementById("pCategory").value.trim(),
+    image_url: document.getElementById("pImage").value.trim(),
+    sizes: document.getElementById("pSizes").value.split(",").map(s => s.trim()).filter(Boolean),
+    stock: Number(document.getElementById("pStock").value)
+  };
+
+  if (!product.name || !product.price || !product.category) {
+    alert("Name, price and category are required.");
+    return;
+  }
+
+  const { error } = await db.from("products").insert([product]);
+
+  if (error) {
+    alert("Error: " + error.message);
+    return;
+  }
+
+  alert("Product added successfully!");
+  showAdminDashboard();
+}
+
+async function loadAdminProducts() {
+  const box = document.getElementById("adminProductList");
+  if (!box) return;
+
+ const { data, error } = await db.from("products").select("*");
+
+  if (error) {
+    box.innerText = "Error: " + error.message;
+    return;
+  }
+
+  if (!data.length) {
+    box.innerText = "No products found.";
+    return;
+  }
+
+  box.innerHTML = data.map(p => `
+    <div style="background:white;padding:15px;margin-bottom:12px;border-radius:8px;display:flex;justify-content:space-between;align-items:center;gap:15px;">
+      <div>
+       <strong>${escapeHTML(p.name)}</strong>
+        <p>৳${p.price} | Stock: ${p.stock}</p>
+        <small>${(p.sizes || []).join(", ")}</small>
+      </div>
+      <button onclick="deleteProduct('${p.id}')" style="padding:9px;background:#a40000;color:white;border:0;border-radius:5px;">DELETE</button>
+    </div>
+  `).join("");
+}
+
+async function deleteProduct(id) {
+  if (!confirm("Delete this product?")) return;
+
+  const { error } = await db.from("products").delete().eq("id", id);
+
+  if (error) {
+    alert("Error: " + error.message);
+    return;
+  }
+
+  alert("Product deleted!");
+  loadAdminProducts();
 }
 
 async function adminLogout() {
@@ -1021,6 +1059,70 @@ if (!new URLSearchParams(window.location.search).has("admin")) return;
   } else {
     await db.auth.signOut();
   }
+}
+
+async function submitOrder() {
+  const name = document.getElementById("coName").value.trim();
+  const phone = document.getElementById("coPhone").value.trim();
+  const address = document.getElementById("coAddress").value.trim();
+  const area = document.getElementById("coArea").value;
+  const trxid = document.getElementById("coTrx").value.trim();
+
+  if (!name || !phone || !address || !trxid) {
+    alert("Please fill in all fields.");
+    return;
+  }
+
+  if (!cart.length) {
+    alert("Your cart is empty.");
+    return;
+  }
+
+  const deliveryCharge = area === "Inside Chattogram" ? 80 : 130;
+
+  const productTotal = cart.reduce(
+    (sum, p) => sum + Number(p.price) * Number(p.quantity || 1), 0
+  );
+
+  const totalAmount = productTotal + deliveryCharge;
+
+  const items = cart.map(p => ({
+    id: p.id,
+    name: p.name,
+    price: Number(p.price),
+    quantity: Number(p.quantity || 1),
+    size: p.selectedSize || p.size || ""
+  }));
+
+  const button = document.getElementById("coSubmit");
+  button.disabled = true;
+  button.textContent = "PLEASE WAIT...";
+
+  const { data, error } = await db.from("orders").insert([{
+    customer_name: name,
+    phone: phone,
+    address: address,
+    delivery_area: area,
+    delivery_charge: deliveryCharge,
+    total_amount: totalAmount,
+    payment_trxid: trxid,
+    status: "pending",
+    items: items
+  }]).select();
+
+  if (error) {
+    alert("Order Error: " + error.message);
+    button.disabled = false;
+    button.textContent = "CONFIRM ORDER";
+    return;
+  }
+
+  alert("Your order has been placed successfully!");
+
+  cart.length = 0;
+  renderCart();
+
+  document.getElementById("checkoutModal").remove();
 }
 
 checkAdminSession();
