@@ -93,11 +93,22 @@
   </div>
 </section>
 
-<section id="cart">
-  <h2>Your Shopping Cart</h2>
+
+<section id="cart" style="background:#f7faf8;padding:25px;border-radius:12px;margin:25px auto;max-width:900px;">
+  <h2 style="color:#031308;margin-bottom:20px;">Your Shopping Cart</h2>
+
   <div id="cartItems">Your cart is empty.</div>
-  <h3>Total: ৳<span id="total">0</span></h3>
+
+  <div style="border-top:1px solid #ddd;margin-top:20px;padding-top:20px;">
+    <h3 style="text-align:right;color:#031308;">
+      Subtotal: ৳<span id="total">0</span>
+    </h3>
+    <button style="width:100%;padding:15px;background:#031308;color:white;border:0;border-radius:6px;font-weight:bold;margin-top:15px;cursor:pointer;">
+      PROCEED TO CHECKOUT
+    </button>
+  </div>
 </section>
+
 
 <footer>
   <h2>ELVN.CO</h2>
@@ -321,16 +332,30 @@ function renderCart() {
 
   document.getElementById("cartItems").innerHTML = cart.length
     ? cart.map((p, i) => `
-        <div class="cart-line">
-          ${escapeHTML(p.name)}
-          — Size: ${escapeHTML(p.selectedSize || "One Size")}
-          — Qty: ${p.quantity || 1}
-          — ৳${Number(p.price) * Number(p.quantity || 1)}
-          <button onclick="removeItem(${i})">Remove</button>
+        <div class="cart-line" style="display:flex;gap:15px;align-items:center;padding:15px 0;border-bottom:1px solid #ddd;flex-wrap:wrap;">
+
+          <img
+            src="${escapeHTML((Array.isArray(p.images) && p.images.length ? p.images[0] : p.image_url) || '')}"
+            alt="${escapeHTML(p.name)}"
+            style="width:100px;height:110px;object-fit:contain;background:white;border-radius:6px;"
+          >
+
+          <div style="flex:1;min-width:150px;">
+            <h3>${escapeHTML(p.name)}</h3>
+            <p>Size: ${escapeHTML(p.selectedSize || "One Size")}</p>
+            <p>Quantity: ${p.quantity || 1}</p>
+            <p>Price: ৳${p.price}</p>
+            <p><strong>Total: ৳${Number(p.price) * Number(p.quantity || 1)}</strong></p>
+            <button onclick="removeItem(${i})" style="padding:7px 12px;background:#031308;color:white;border:0;border-radius:4px;cursor:pointer;">
+              REMOVE
+            </button>
+          </div>
+
         </div>
       `).join("")
     : "Your cart is empty.";
 }
+
 
 
   function removeItem(index) {
