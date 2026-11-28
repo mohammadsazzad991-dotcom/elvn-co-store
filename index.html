@@ -688,17 +688,27 @@ function renderCart() {
  
 }
 
+
 function changeCartQuantity(index, change) {
   if (!cart[index]) return;
 
-  cart[index].quantity = Number(cart[index].quantity || 1) + change;
+  // Clear animation from all products
+  cart.forEach(p => {
+    p._justAdded = false;
+  });
+
+  cart[index].quantity =
+    Number(cart[index].quantity || 1) + change;
 
   if (cart[index].quantity <= 0) {
     cart.splice(index, 1);
+  } else {
+    cart[index]._justAdded = true;
   }
 
   renderCart();
 }
+
 
 
 
