@@ -712,10 +712,28 @@ function changeCartQuantity(index, change) {
 
 
 
-  function removeItem(index) {
+  
+function removeItem(index) {
+  if (!cart[index]) return;
+
+  const item = document.querySelectorAll("#cart .cart-line")[index];
+
+  if (!item) {
     cart.splice(index, 1);
     renderCart();
+    return;
   }
+
+  item.style.transition = "opacity 0.35s ease, transform 0.35s ease";
+  item.style.opacity = "0";
+  item.style.transform = "translateX(50px)";
+
+  setTimeout(() => {
+    cart.splice(index, 1);
+    renderCart();
+  }, 350);
+}
+
 
   loadProducts();
 </script>
