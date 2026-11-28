@@ -111,7 +111,7 @@ container.innerHTML = data.map(p => {
             data-src="${escapeHTML(img)}"
             src="${escapeHTML(img)}"
             alt="Product image ${i + 1}"
-            style="width:55px;height:55px;object-fit:cover;cursor:pointer;border:1px solid #ccc;border-radius:4px;"
+            style="width:55px;height:55px;object-fit:contain;cursor:pointer;border:1px solid #ccc;border-radius:4px;background:white;"
           >
         `).join("")}
       </div>
