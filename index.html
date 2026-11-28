@@ -758,19 +758,11 @@ function removeItem(index, button) {
       cart.splice(currentIndex, 1);
     }
 
-    item.remove();
+    cart.forEach(p => {
+      p._justAdded = false;
+    });
 
-    document.getElementById("count").textContent =
-      cart.reduce((sum, p) => sum + Number(p.quantity || 1), 0);
-
-    document.getElementById("total").textContent =
-      cart.reduce((sum, p) =>
-        sum + Number(p.price) * Number(p.quantity || 1), 0);
-
-    if (cart.length === 0) {
-      document.getElementById("cartItems").textContent =
-        "Your cart is empty.";
-    }
+    renderCart();
   };
 }
   loadProducts();
