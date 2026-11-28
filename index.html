@@ -89,16 +89,51 @@
       return;
     }
 
-    container.innerHTML = data.map(p => `
-      <div class="product">
-        <img src="${p.image_url || ''}" alt="${p.name}" onerror="this.style.display='none'">
-        <div class="info">
-          <h3>${escapeHTML(p.name)}</h3>
-          <p class="price">৳${p.price}</p>
-          <button class="add" onclick="addToCart('${p.id}')">ADD TO CART</button>
-        </div>
+   
+container.innerHTML = data.map(p => {
+  const images = Array.isArray(p.images) && p.images.length
+    ? p.images
+    : [p.image_url].filter(Boolean);
+
+  return `
+    <div class="product">
+      <img
+        class="product-main-image"
+        src="${escapeHTML(images[0] || '')}"
+        alt="${escapeHTML(p.name)}"
+        onerror="this.style.display='none'"
+      >
+
+      <div class="product-thumbnails" style="display:flex;gap:8px;margin:10px 0;">
+        ${images.map((img, i) => `
+          <img
+            class="product-thumb"
+            data-src="${escapeHTML(img)}"
+            src="${escapeHTML(img)}"
+            alt="Product image ${i + 1}"
+            style="width:55px;height:55px;object-fit:cover;cursor:pointer;border:1px solid #ccc;border-radius:4px;"
+          >
+        `).join("")}
       </div>
-    `).join("");
+
+      <div class="info">
+        <h3>${escapeHTML(p.name)}</h3>
+        <p class="price">৳${p.price}</p>
+        <button class="add" onclick="addToCart('${p.id}')">ADD TO CART</button>
+      </div>
+    </div>
+  `;
+}).join("");
+
+container.querySelectorAll(".product-thumb").forEach(thumb => {
+  thumb.addEventListener("click", function() {
+    const mainImage = this.closest(".product")
+      .querySelector(".product-main-image");
+
+    mainImage.src = this.dataset.src;
+  });
+});
+
 
     window.productsData = data;
   }
